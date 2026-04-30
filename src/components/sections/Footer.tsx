@@ -1,5 +1,6 @@
 
 import { businessConfig } from "../../config/business";
+import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Facebook, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -65,8 +66,22 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-12 text-center text-[10px] uppercase font-bold tracking-widest text-slate-600">
+        <div className="border-t border-white/5 pt-12 text-center text-[10px] uppercase font-bold tracking-widest text-slate-600 flex flex-col items-center gap-4">
           <p>© {new Date().getFullYear()} {businessConfig.name} • DineDash Professional Edition</p>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:text-slate-400 transition-colors">Privacy</a>
+            <span className="text-slate-800">•</span>
+            <a href="#" className="hover:text-slate-400 transition-colors">Terms</a>
+            <span className="text-slate-800">•</span>
+            <Link 
+              to="/admin" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-500 hover:text-red-700 transition-colors"
+            >
+              Restaurant Portal
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
