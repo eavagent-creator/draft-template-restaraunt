@@ -9,7 +9,10 @@ import { Plus, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 
+import { useTranslation } from "react-i18next";
+
 export const MenuGrid = () => {
+  const { t } = useTranslation();
   const { addToCart } = useCart();
   const categories = Array.from(new Set(businessConfig.menu.map(item => item.category)));
   const [activeCategory, setActiveCategory] = useState(categories[0]);
@@ -17,8 +20,13 @@ export const MenuGrid = () => {
   const filteredMenu = businessConfig.menu.filter(item => item.category === activeCategory);
 
   const handleAddToCart = (item: any) => {
-    addToCart(item);
-    toast.success(`Added ${item.name} to cart`);
+    const translatedItem = {
+      ...item,
+      name: t(`menu.items.${item.id}.name`),
+      description: t(`menu.items.${item.id}.description`),
+    };
+    addToCart(translatedItem);
+    toast.success(`${t('menu.available')}: ${translatedItem.name}`);
   };
 
   return (
@@ -26,8 +34,8 @@ export const MenuGrid = () => {
       <div className="container px-4 mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Our Menu</h3>
-            <h2 className="text-4xl font-extrabold text-slate-800">Fresh Bridgeport Picks</h2>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">{t('menu.title')}</h3>
+            <h2 className="text-4xl font-extrabold text-slate-800">{t('menu.subtitle')}</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map(category => (
@@ -37,7 +45,7 @@ export const MenuGrid = () => {
                 className={`rounded-lg px-6 font-bold text-xs uppercase tracking-wider h-10 ${activeCategory === category ? 'bg-red-700 hover:bg-red-800 border-none' : 'bg-white border-slate-200 text-slate-600'}`}
                 onClick={() => setActiveCategory(category)}
               >
-                {category}
+                {t(`menu.categories.${category.toLowerCase()}`)}
               </Button>
             ))}
           </div>
@@ -61,7 +69,7 @@ export const MenuGrid = () => {
                   <div className="relative h-64 overflow-hidden">
                     <img 
                       src={item.image} 
-                      alt={item.name}
+                      alt={t(`menu.items.${item.id}.name`)}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute top-4 right-4 flex flex-col gap-2">
@@ -74,19 +82,19 @@ export const MenuGrid = () => {
                   </div>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl font-bold text-slate-800">{item.name}</CardTitle>
+                      <CardTitle className="text-xl font-bold text-slate-800">{t(`menu.items.${item.id}.name`)}</CardTitle>
                       <span className="text-lg font-extrabold text-red-700">${item.price.toFixed(2)}</span>
                     </div>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-slate-500 text-sm leading-relaxed">{item.description}</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">{t(`menu.items.${item.id}.description`)}</p>
                   </CardContent>
                   <CardFooter className="pt-4 border-t border-slate-100">
                     <Button 
                       className="w-full bg-white border-2 border-slate-100 font-bold text-slate-800 hover:bg-slate-50 rounded-xl transition-colors h-11"
                       onClick={() => handleAddToCart(item)}
                     >
-                      <Plus className="w-4 h-4 mr-2" /> Add to Order
+                      <Plus className="w-4 h-4 mr-2" /> {t('menu.addToCart')}
                     </Button>
                   </CardFooter>
                 </Card>

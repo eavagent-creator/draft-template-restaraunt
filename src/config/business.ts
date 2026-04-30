@@ -67,6 +67,42 @@ export const businessConfig: BusinessConfig = {
       image: "https://images.unsplash.com/photo-1511910849309-0dffb8c83742?auto=format&fit=crop&q=80&w=800",
       tags: ["Hot"],
       isAvailable: true
+    },
+    {
+      id: "5",
+      name: "Calamari Fritti",
+      description: "Crispy fried squid rings served with a spicy marinara and lemon wedge.",
+      price: 14.50,
+      category: "Appetizers",
+      image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=800",
+      isAvailable: true
+    },
+    {
+      id: "6",
+      name: "Grilled Swordfish",
+      description: "Center-cut swordfish steak, grilled with lemon herb butter and roasted asparagus.",
+      price: 28.00,
+      category: "Seafood",
+      image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=800",
+      isAvailable: true
+    },
+    {
+      id: "7",
+      name: "Chicken Parmigiana",
+      description: "Breaded chicken breast, melted mozzarella, and marinara over spaghetti.",
+      price: 19.50,
+      category: "Pasta",
+      image: "https://images.unsplash.com/photo-1632778149975-420e0e75ee08?auto=format&fit=crop&q=80&w=800",
+      isAvailable: true
+    },
+    {
+      id: "8",
+      name: "Tiramisu",
+      description: "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone.",
+      price: 9.00,
+      category: "Desserts",
+      image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=800",
+      isAvailable: true
     }
   ],
   faqs: [

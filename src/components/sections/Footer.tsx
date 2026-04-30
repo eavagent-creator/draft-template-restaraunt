@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Instagram, Facebook, Clock } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
+import { useTranslation } from "react-i18next";
+
 export const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer id="contact" className="bg-slate-900 text-slate-400 pt-24 pb-12">
       <div className="container px-4 mx-auto">
@@ -15,7 +18,7 @@ export const Footer = () => {
                {businessConfig.name}
             </a>
             <p className="mb-6 text-sm leading-relaxed text-slate-400">
-              A Bridgeport landmark serving the community with passion since 2015. Crafted with locally sourced ingredients and urban pride.
+              {t('hero.subtitle')}
             </p>
             <div className="flex items-center gap-4">
               <a href={businessConfig.socials.instagram} className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-red-700 transition-colors text-white">
@@ -28,7 +31,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">Hours</h4>
+            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">{t('footer.hours')}</h4>
             <ul className="space-y-4 text-[13px]">
               {businessConfig.hours.map((hour, i) => (
                 <li key={i} className="flex justify-between">
@@ -39,7 +42,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">Locate</h4>
+            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">{t('footer.location')}</h4>
             <address className="not-italic text-[13px] leading-loose">
               <div className="font-bold text-white mb-1">Bridgeport Downtown</div>
               {businessConfig.address}<br />
@@ -48,7 +51,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">Connect</h4>
+            <h4 className="text-white text-xs font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-2">{t('nav.contact')}</h4>
             <ul className="space-y-4 text-[13px]">
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-red-500">
@@ -67,7 +70,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-white/5 pt-12 text-center text-[10px] uppercase font-bold tracking-widest text-slate-600 flex flex-col items-center gap-4">
-          <p>© {new Date().getFullYear()} {businessConfig.name} • DineDash Professional Edition</p>
+          <p>© {new Date().getFullYear()} {businessConfig.name} • {t('footer.rights')}</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-slate-400 transition-colors">Privacy</a>
             <span className="text-slate-800">•</span>
@@ -79,7 +82,7 @@ export const Footer = () => {
               rel="noopener noreferrer"
               className="text-slate-500 hover:text-red-700 transition-colors"
             >
-              Restaurant Portal
+              {t('nav.dashboard')}
             </Link>
           </div>
         </div>

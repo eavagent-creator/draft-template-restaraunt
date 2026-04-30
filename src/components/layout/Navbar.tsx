@@ -24,8 +24,10 @@ import {
   LogOut, 
   User,
   LayoutDashboard,
-  Settings
+  Settings,
+  Globe
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { CheckoutDialog } from "../sections/CheckoutDialog";
@@ -37,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const { cart, itemCount, total, subtotal, updateQuantity, removeFromCart } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -69,28 +72,37 @@ export const Navbar = () => {
 
   const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
     if (isAdminPage) return null;
+    const itemClass = "hover:text-red-700 transition-colors flex items-center justify-between group";
+    
     return (
       <>
-        <a 
-          href="#menu" 
+        <Link 
+          to="/menu"
           onClick={() => mobile && setIsNavOpen(false)}
-          className="hover:text-red-700 transition-colors flex items-center justify-between group"
+          className={itemClass}
         >
-          Menu
+          {t('nav.menu')}
+        </Link>
+        <Link 
+          to="/orders"
+          onClick={() => mobile && setIsNavOpen(false)}
+          className={itemClass}
+        >
+          Orders
+        </Link>
+        <a 
+          href="/#faq" 
+          onClick={() => mobile && setIsNavOpen(false)}
+          className={itemClass}
+        >
+          {t('nav.faq')}
         </a>
         <a 
-          href="#faq" 
+          href="/#contact" 
           onClick={() => mobile && setIsNavOpen(false)}
-          className="hover:text-red-700 transition-colors flex items-center justify-between group"
+          className={itemClass}
         >
-          FAQs
-        </a>
-        <a 
-          href="#contact" 
-          onClick={() => mobile && setIsNavOpen(false)}
-          className="hover:text-red-700 transition-colors flex items-center justify-between group"
-        >
-          Contact
+          {t('nav.contact')}
         </a>
       </>
     );
@@ -116,6 +128,30 @@ export const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Language Switcher */}
+          <DropdownMenu>
+            <DropdownMenuTrigger render={
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`hidden sm:flex ${textColor} hover:bg-white/10`}
+              >
+                <Globe className="w-5 h-5" />
+              </Button>
+            } />
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => i18n.changeLanguage('en')} className={i18n.language === 'en' ? 'font-bold' : ''}>
+                🇺🇸 English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => i18n.changeLanguage('es')} className={i18n.language === 'es' ? 'font-bold' : ''}>
+                🇪🇸 Español
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => i18n.changeLanguage('pt')} className={i18n.language === 'pt' ? 'font-bold' : ''}>
+                🇧🇷 Português
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Sheet open={isNavOpen} onOpenChange={setIsNavOpen}>
             <SheetTrigger 
               render={
@@ -132,16 +168,24 @@ export const Navbar = () => {
               <SheetHeader className="text-left pb-6 border-b border-slate-100">
                 <SheetTitle className="text-2xl font-extrabold text-slate-800">
                   <span className="bg-red-700 text-white px-2 py-0.5 rounded-md mr-2">B</span>
-                  Navigation
+                  {t('nav.navigation')}
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-6 py-8 font-bold text-slate-800 text-lg">
                 <NavLinks mobile />
+                <div className="pt-4 border-t border-slate-100 flex flex-col gap-4">
+                  <span className="text-xs uppercase text-slate-400 font-bold tracking-widest">Language / Idioma</span>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => i18n.changeLanguage('en')} className={i18n.language === 'en' ? 'border-red-700 bg-red-50 text-red-700' : ''}>EN</Button>
+                    <Button variant="outline" size="sm" onClick={() => i18n.changeLanguage('es')} className={i18n.language === 'es' ? 'border-red-700 bg-red-50 text-red-700' : ''}>ES</Button>
+                    <Button variant="outline" size="sm" onClick={() => i18n.changeLanguage('pt')} className={i18n.language === 'pt' ? 'border-red-700 bg-red-50 text-red-700' : ''}>PT</Button>
+                  </div>
+                </div>
               </div>
               {!user && (
                 <div className="mt-auto pt-8 border-t border-slate-100">
                   <Button onClick={handleLogin} className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-12 rounded-xl">
-                    <LogIn className="w-4 h-4 mr-2" /> Sign In / Register
+                    <LogIn className="w-4 h-4 mr-2" /> {t('nav.signIn')}
                   </Button>
                 </div>
               )}
@@ -163,15 +207,15 @@ export const Navbar = () => {
                 </div>
                 {isAdminPage ? (
                    <DropdownMenuItem render={<Link to="/" className="flex items-center w-full" />}>
-                       <LayoutDashboard className="w-4 h-4 mr-2" /> View Site
+                       <LayoutDashboard className="w-4 h-4 mr-2" /> {t('nav.viewSite')}
                    </DropdownMenuItem>
                 ) : (
                    <DropdownMenuItem render={<Link to="/admin" target="_blank" rel="noopener noreferrer" className="flex items-center w-full" />}>
-                       <Settings className="w-4 h-4 mr-2" /> Dashboard
+                       <Settings className="w-4 h-4 mr-2" /> {t('nav.dashboard')}
                    </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleLogout} className="text-red-600 font-medium">
-                  <LogOut className="w-4 h-4 mr-2" /> Logout
+                  <LogOut className="w-4 h-4 mr-2" /> {t('nav.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -182,7 +226,7 @@ export const Navbar = () => {
               onClick={handleLogin}
               className={`hidden sm:flex items-center gap-2 font-bold ${textColor} hover:bg-white/10`}
             >
-              <LogIn className="w-4 h-4" /> Sign In
+              <LogIn className="w-4 h-4" /> {t('nav.signIn')}
             </Button>
           )}
 
@@ -207,7 +251,7 @@ export const Navbar = () => {
               <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-white">
                 <SheetHeader className="pb-6 border-b border-slate-100">
                   <SheetTitle className="text-2xl font-extrabold flex items-center gap-2 text-slate-800">
-                    Your Order <span className="bg-red-700 text-white text-[10px] px-2 py-0.5 rounded-full">{itemCount}</span>
+                    {t('cart.title')} <span className="bg-red-700 text-white text-[10px] px-2 py-0.5 rounded-full">{itemCount}</span>
                   </SheetTitle>
                 </SheetHeader>
 
@@ -217,8 +261,8 @@ export const Navbar = () => {
                       <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                         <ShoppingBag className="w-8 h-8 text-slate-400" />
                       </div>
-                      <h3 className="text-lg font-bold text-slate-400 italic">Your basket is hungry!</h3>
-                      <p className="text-slate-400 text-xs mt-1">Add items from the menu to start your order.</p>
+                      <h3 className="text-lg font-bold text-slate-400 italic">{t('cart.empty')}</h3>
+                      <p className="text-slate-400 text-xs mt-1">{t('cart.emptySub')}</p>
                     </div>
                   ) : (
                     <ScrollArea className="flex-grow pr-4 py-6">
@@ -265,25 +309,25 @@ export const Navbar = () => {
                 </div>
 
                 {cart.length > 0 && (
-                  <SheetFooter className="mt-auto border-t border-slate-100 pt-6 block sm:flex-col gap-4">
+                   <SheetFooter className="mt-auto border-t border-slate-100 pt-6 block sm:flex-col gap-4">
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-500 font-medium">Subtotal</span>
+                        <span className="text-slate-500 font-medium">{t('cart.subtotal')}</span>
                         <span className="font-bold text-slate-800">${subtotal.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-slate-500 font-medium">Delivery Fee</span>
+                        <span className="text-slate-500 font-medium">{t('cart.deliveryFee')}</span>
                         <span className="font-bold text-slate-800">${businessConfig.delivery.fee.toFixed(2)}</span>
                       </div>
                       <Separator className="my-2 border-dashed" />
                       <div className="flex justify-between text-xl font-extrabold text-slate-800">
-                        <span>Total</span>
+                        <span>{t('cart.total')}</span>
                         <span className="text-red-700">${total.toFixed(2)}</span>
                       </div>
                     </div>
                     <CheckoutDialog>
                       <Button className="w-full bg-red-700 hover:bg-red-800 text-white h-14 text-sm font-bold uppercase tracking-widest rounded-2xl shadow-lg transition-transform active:scale-95">
-                        Review & Checkout
+                        {t('cart.checkout')}
                       </Button>
                     </CheckoutDialog>
                   </SheetFooter>

@@ -18,15 +18,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingBag, CheckCircle2, Loader2 } from "lucide-react";
+import { ShoppingBag, CheckCircle2, Loader2, CreditCard, Banknote } from "lucide-react";
 import { toast } from "sonner";
 
+import { useTranslation } from "react-i18next";
+
 export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation();
   const { cart, total, subtotal, clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [orderType, setOrderType] = useState<"delivery" | "pickup">("pickup");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,6 +52,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
       customerPhone: formData.phone,
       address: orderType === "delivery" ? formData.address : "Pickup at Restaurant",
       type: orderType,
+      paymentMethod,
       items: cart.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price })),
       subtotal: subtotal,
       deliveryFee: orderType === "delivery" ? businessConfig.delivery.fee : 0,
@@ -60,8 +65,14 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
 
     try {
       await setDoc(doc(db, "orders", orderId), orderData);
+      
+      const stored = localStorage.getItem('pastOrders');
+      const pastOrders = stored ? JSON.parse(stored) : [];
+      pastOrders.push({ id: orderId, createdAt: Date.now() });
+      localStorage.setItem('pastOrders', JSON.stringify(pastOrders));
+
       setIsOrdered(true);
-      toast.success("Order received! Check your email for confirmation.");
+      toast.success(t('checkout.successToast'));
       setTimeout(() => {
         setIsOpen(false);
         setIsOrdered(false);
@@ -70,7 +81,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
       }, 3000);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, `orders/${orderId}`);
-      toast.error("Failed to place order. Please try again.");
+      toast.error(t('checkout.errorToast'));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +97,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
       <DialogContent className="sm:max-w-[500px] bg-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            {isOrdered ? "Order Confirmed!" : "Complete Your Order"}
+            {isOrdered ? t('checkout.confirmed') : t('checkout.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -95,23 +106,25 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Thank you for your order!</h3>
+            <h3 className="text-xl font-bold mb-2">{t('checkout.thanks')}</h3>
             <p className="text-zinc-500 max-w-sm">
-              We've received your request. {orderType === "delivery" ? `It should arrive in ${businessConfig.delivery.estimatedTime}.` : `It will be ready for pickup in ${businessConfig.pickup.estimatedTime}.`}
+              {t('checkout.received')} {orderType === "delivery" 
+                ? t('checkout.willArrive', { time: businessConfig.delivery.estimatedTime }) 
+                : t('checkout.willBeReady', { time: businessConfig.pickup.estimatedTime })}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6 pt-4">
             <Tabs defaultValue="pickup" onValueChange={(v) => setOrderType(v as any)}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="pickup" disabled={isLoading}>Pickup</TabsTrigger>
-                <TabsTrigger value="delivery" disabled={isLoading}>Delivery</TabsTrigger>
+                <TabsTrigger value="pickup" disabled={isLoading}>{t('checkout.pickup')}</TabsTrigger>
+                <TabsTrigger value="delivery" disabled={isLoading}>{t('checkout.delivery')}</TabsTrigger>
               </TabsList>
               
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">{t('checkout.fullName')}</Label>
                     <Input 
                       id="name" 
                       placeholder="John Doe" 
@@ -122,7 +135,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone">{t('checkout.phoneNumber')}</Label>
                     <Input 
                       id="phone" 
                       type="tel" 
@@ -136,7 +149,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">{t('checkout.emailAddress')}</Label>
                   <Input 
                     id="email" 
                     type="email" 
@@ -150,7 +163,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
 
                 {orderType === "delivery" && (
                   <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2">
-                    <Label htmlFor="address">Delivery Address</Label>
+                    <Label htmlFor="address">{t('checkout.deliveryAddress')}</Label>
                     <Input 
                       id="address" 
                       placeholder="123 Bridgeport Ave" 
@@ -163,22 +176,42 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="notes">Order Notes (Optional)</Label>
+                  <Label htmlFor="notes">{t('checkout.notes')}</Label>
                   <Textarea 
                     id="notes" 
-                    placeholder="Allergies, door codes, or special instructions..."
+                    placeholder={t('checkout.placeholderNotes')}
                     className="resize-none"
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     disabled={isLoading}
                   />
                 </div>
+
+                <div className="space-y-3 pt-2">
+                  <Label>Payment Method</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div 
+                      className={`border rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-red-700 bg-red-50 text-red-700' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}
+                      onClick={() => setPaymentMethod('card')}
+                    >
+                      <CreditCard className="w-6 h-6" />
+                      <span className="font-semibold text-sm">Credit / Debit</span>
+                    </div>
+                    <div 
+                      className={`border rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${paymentMethod === 'cash' ? 'border-red-700 bg-red-50 text-red-700' : 'border-slate-200 hover:bg-slate-50 text-slate-600'}`}
+                      onClick={() => setPaymentMethod('cash')}
+                    >
+                      <Banknote className="w-6 h-6" />
+                      <span className="font-semibold text-sm">Cash</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </Tabs>
 
             <div className="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-200">
               <div className="flex justify-between text-sm items-center">
-                <span className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Grand Total</span>
+                <span className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">{t('checkout.grandTotal')}</span>
                 <span className="font-extrabold text-red-700 text-2xl tracking-tight">
                   ${(orderType === 'delivery' ? total : subtotal).toFixed(2)}
                 </span>
@@ -194,7 +227,7 @@ export const CheckoutDialog = ({ children }: { children: React.ReactNode }) => {
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  `Place ${orderType === 'delivery' ? 'Delivery' : 'Pickup'} Order`
+                  t('checkout.placeOrder', { type: orderType === 'delivery' ? t('checkout.delivery') : t('checkout.pickup') })
                 )}
               </Button>
             </DialogFooter>

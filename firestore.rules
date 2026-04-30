@@ -37,21 +37,24 @@ service cloud.firestore {
         && data.customerEmail is string && data.customerEmail.size() <= 100
         && data.customerPhone is string && data.customerPhone.size() <= 20
         && data.type in ['pickup', 'delivery']
-        && data.status in ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled']
+        && data.status in ['pending', 'accepted', 'preparing', 'completed', 'cancelled']
         && data.items is list && data.items.size() > 0 && data.items.size() <= 50
         && data.total is number && data.total >= 0
-        && data.createdAt == request.time;
+        && data.createdAt is timestamp
+        && (!data.keys().hasAny(['isDelayed']) || data.isDelayed is bool)
+        && (!data.keys().hasAny(['delayMinutes']) || data.delayMinutes is number)
+        && (!data.keys().hasAny(['estimatedReadyAt']) || data.estimatedReadyAt is timestamp)
+        && (!data.keys().hasAny(['paymentMethod']) || data.paymentMethod in ['card', 'cash']);
     }
 
     // --- Collections ---
     match /orders/{orderId} {
       allow create: if isValidId(orderId) && isValidOrder(incoming()) && (
-        incoming().status == 'pending'
+        incoming().status == 'pending' &&
+        incoming().createdAt == request.time
       );
       
-      allow get: if isAdmin() || (
-        isSignedIn() && resource.data.customerId == request.auth.uid
-      );
+      allow get: if true; // Order ID acts as secret
 
       allow list: if isAdmin() || (
         isSignedIn() && resource.data.customerId == request.auth.uid
@@ -59,7 +62,7 @@ service cloud.firestore {
 
       allow update: if isAdmin() && (
         isValidOrder(incoming()) && 
-        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt', 'isDelayed', 'estimatedReadyAt', 'delayMinutes']) &&
         incoming().updatedAt == request.time
       );
 

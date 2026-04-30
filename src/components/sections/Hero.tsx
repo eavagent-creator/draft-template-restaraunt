@@ -4,7 +4,12 @@ import { businessConfig } from "../../config/business";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Utensils } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
+import { Link } from "react-router-dom";
+
 export const Hero = () => {
+  const { t } = useTranslation();
   return (
     <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
       <div 
@@ -26,22 +31,25 @@ export const Hero = () => {
         >
           <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-widest mb-4 mt-4 md:mt-0">
             <Utensils className="w-3 h-3" />
-            Selection of {businessConfig.name}
+            {t('footer.about')} {businessConfig.name}
           </span>
-          <h1 className="text-4xl sm:text-5xl md:text-8xl font-extrabold tracking-tight mb-6">
-            Park City <br />
-            <span className="text-red-700">Favorites</span>
+          <h1 className="text-4xl sm:text-5xl md:text-8xl font-extrabold tracking-tight mb-6 whitespace-pre-line">
+            {t('hero.title')}
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-10 font-medium">
-            {businessConfig.description}
+            {t('hero.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-red-700 hover:bg-red-800 text-white min-w-[220px] h-14 rounded-full font-bold shadow-xl" onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}>
-              Order Online Now
-            </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 min-w-[220px] h-14 rounded-full font-bold text-white shadow-lg">
-              Our Locations
-            </Button>
+            <div className="w-full sm:w-auto">
+              <Button size="lg" className="bg-red-700 hover:bg-red-800 text-white w-full sm:min-w-[220px] h-14 rounded-full font-bold shadow-xl" onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}>
+                {t('hero.orderNow')}
+              </Button>
+            </div>
+            <Link to="/menu" className="block w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 w-full sm:min-w-[220px] h-14 rounded-full font-bold text-white shadow-lg">
+                {t('hero.viewMenu')}
+              </Button>
+            </Link>
           </div>
         </motion.div>
       </div>
