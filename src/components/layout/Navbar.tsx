@@ -162,16 +162,12 @@ export const Navbar = () => {
                   {user.email}
                 </div>
                 {isAdminPage ? (
-                   <DropdownMenuItem asChild>
-                     <Link to="/" className="flex items-center w-full">
+                   <DropdownMenuItem render={<Link to="/" className="flex items-center w-full" />}>
                        <LayoutDashboard className="w-4 h-4 mr-2" /> View Site
-                     </Link>
                    </DropdownMenuItem>
                 ) : (
-                   <DropdownMenuItem asChild>
-                     <Link to="/admin" target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
+                   <DropdownMenuItem render={<Link to="/admin" target="_blank" rel="noopener noreferrer" className="flex items-center w-full" />}>
                        <Settings className="w-4 h-4 mr-2" /> Dashboard
-                     </Link>
                    </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={handleLogout} className="text-red-600 font-medium">

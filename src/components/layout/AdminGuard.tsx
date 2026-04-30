@@ -4,7 +4,7 @@ import { auth } from "../../lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { motion } from "motion/react";
 import { Lock, Navigation } from "lucide-react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 
 // The bootstrap admin email
 const ADMIN_EMAILS = ["edgaragronvargas@gmail.com"];
