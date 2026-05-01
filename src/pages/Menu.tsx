@@ -2,24 +2,24 @@
 import React from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { businessConfig } from "@/config/business";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { Plus, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useMenu } from "@/hooks/useMenu";
 
 const Menu = () => {
   const { t } = useTranslation();
   const { addToCart } = useCart();
-  const categories = Array.from(new Set(businessConfig.menu.map(item => item.category)));
+  const { menuItems, categories, loading } = useMenu();
 
   const handleAddToCart = (item: any) => {
     const translatedItem = {
       ...item,
-      name: t(`menu.items.${item.id}.name`),
-      description: t(`menu.items.${item.id}.description`),
+      name: t(`menu.items.${item.id}.name`, { defaultValue: item.name }),
+      description: t(`menu.items.${item.id}.description`, { defaultValue: item.description }),
     };
     addToCart(translatedItem);
     toast.success(`${t('menu.available')}: ${translatedItem.name}`);
@@ -50,14 +50,14 @@ const Menu = () => {
           <div key={category} className="mb-16">
             <div className="flex items-center gap-4 mb-8">
               <h2 className="text-2xl font-bold text-slate-800 uppercase tracking-wider">
-                {t(`menu.categories.${category.toLowerCase()}`)}
+                {t(`menu.categories.${category.toLowerCase()}`, { defaultValue: category })}
               </h2>
               <div className="flex-grow h-px bg-slate-200" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {businessConfig.menu
-                .filter(item => item.category === category)
+              {menuItems
+                .filter(item => item.category === category && item.isAvailable !== false)
                 .map((item, idx) => (
                   <motion.div
                     key={item.id}
@@ -69,7 +69,7 @@ const Menu = () => {
                       <div className="relative h-56 overflow-hidden">
                         <img 
                           src={item.image} 
-                          alt={t(`menu.items.${item.id}.name`)}
+                          alt={t(`menu.items.${item.id}.name`, { defaultValue: item.name })}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                         {item.tags?.map((tag, i) => (
@@ -83,7 +83,7 @@ const Menu = () => {
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start gap-4">
                           <CardTitle className="text-xl font-bold text-slate-800 group-hover:text-red-700 transition-colors">
-                            {t(`menu.items.${item.id}.name`)}
+                            {t(`menu.items.${item.id}.name`, { defaultValue: item.name })}
                           </CardTitle>
                           <span className="text-xl font-extrabold text-slate-900 tracking-tighter">
                             ${item.price.toFixed(2)}
@@ -92,7 +92,7 @@ const Menu = () => {
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">
-                          {t(`menu.items.${item.id}.description`)}
+                          {t(`menu.items.${item.id}.description`, { defaultValue: item.description })}
                         </p>
                       </CardContent>
                       <CardFooter className="pt-4 border-t border-slate-50">

@@ -117,9 +117,10 @@ export const Navbar = () => {
     >
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className={`text-2xl font-bold tracking-tight ${textColor}`}>
-             <span className="bg-red-700 text-white px-2 py-0.5 rounded-md mr-2">B</span>
-             {businessConfig.name}
+          <Link to="/" className={`text-2xl font-bold tracking-tight ${textColor} transition-opacity`}>
+             <span className={`${!isAdminPage && !isScrolled ? 'opacity-0 invisible' : 'opacity-100 visible'} flex items-center`}>
+               <span className="truncate max-w-[200px] md:max-w-none">{businessConfig.name}</span>
+             </span>
              {isAdminPage && <span className="ml-2 text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full uppercase tracking-tighter">Admin</span>}
           </Link>
           <div className={`hidden md:flex gap-8 text-sm font-semibold ${isAdminPage || isScrolled ? 'text-slate-600' : 'text-white/80'}`}>

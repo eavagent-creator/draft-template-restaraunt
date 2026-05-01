@@ -21,12 +21,31 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["customerName", "customerEmail", "customerPhone", "type", "items", "total", "status", "createdAt"]
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "A food item on the menu",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "isAvailable": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "category", "image"]
     }
   },
   "firestore": {
     "orders": {
       "schema": "Order",
       "description": "Collection of customer orders"
+    },
+    "menuItems": {
+      "schema": "MenuItem",
+      "description": "Collection of menu items"
     }
   }
 }

@@ -12,14 +12,27 @@ export const Hero = () => {
   const { t } = useTranslation();
   return (
     <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1920')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      <div className="absolute inset-0 z-0 bg-slate-900">
+        {/* Blurred background for wide screens */}
+        <div 
+          className="absolute inset-0 blur-3xl opacity-50 scale-110"
+          style={{
+            backgroundImage: `url('/storefront.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* Crisp contained foreground image */}
+        <div 
+          className="absolute inset-0 opacity-80"
+          style={{
+            backgroundImage: `url('/storefront.jpg')`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/50" />
       </div>
 
@@ -29,10 +42,6 @@ export const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-widest mb-4 mt-4 md:mt-0">
-            <Utensils className="w-3 h-3" />
-            {t('footer.about')} {businessConfig.name}
-          </span>
           <h1 className="text-4xl sm:text-5xl md:text-8xl font-extrabold tracking-tight mb-6 whitespace-pre-line">
             {t('hero.title')}
           </h1>

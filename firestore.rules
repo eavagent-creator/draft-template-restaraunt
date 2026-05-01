@@ -47,7 +47,24 @@ service cloud.firestore {
         && (!data.keys().hasAny(['paymentMethod']) || data.paymentMethod in ['card', 'cash']);
     }
 
+    // --- Menu Item Validation ---
+    function isValidMenuItem(data) {
+      return data.name is string && data.name.size() <= 100
+        && (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 1000))
+        && data.price is number && data.price >= 0
+        && data.category is string && data.category.size() <= 100
+        && data.image is string && data.image.size() <= 1048576 
+        && (!data.keys().hasAny(['isAvailable']) || data.isAvailable is bool)
+        && (!data.keys().hasAny(['createdAt']) || data.createdAt is timestamp);
+    }
+
     // --- Collections ---
+    match /menuItems/{itemId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(itemId) && isValidMenuItem(incoming());
+      allow delete: if isAdmin();
+    }
+
     match /orders/{orderId} {
       allow create: if isValidId(orderId) && isValidOrder(incoming()) && (
         incoming().status == 'pending' &&

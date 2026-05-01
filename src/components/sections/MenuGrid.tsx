@@ -1,6 +1,5 @@
 
-import { useState } from "react";
-import { businessConfig } from "../../config/business";
+import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,22 +7,28 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
-
 import { useTranslation } from "react-i18next";
+import { useMenu } from "@/hooks/useMenu";
 
 export const MenuGrid = () => {
   const { t } = useTranslation();
   const { addToCart } = useCart();
-  const categories = Array.from(new Set(businessConfig.menu.map(item => item.category)));
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const { menuItems, categories, loading } = useMenu();
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const filteredMenu = businessConfig.menu.filter(item => item.category === activeCategory);
+  useEffect(() => {
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0]);
+    }
+  }, [categories, activeCategory]);
+
+  const filteredMenu = menuItems.filter(item => item.category === activeCategory && item.isAvailable !== false);
 
   const handleAddToCart = (item: any) => {
     const translatedItem = {
       ...item,
-      name: t(`menu.items.${item.id}.name`),
-      description: t(`menu.items.${item.id}.description`),
+      name: t(`menu.items.${item.id}.name`, { defaultValue: item.name }),
+      description: t(`menu.items.${item.id}.description`, { defaultValue: item.description }),
     };
     addToCart(translatedItem);
     toast.success(`${t('menu.available')}: ${translatedItem.name}`);
@@ -45,7 +50,7 @@ export const MenuGrid = () => {
                 className={`rounded-lg px-6 font-bold text-xs uppercase tracking-wider h-10 ${activeCategory === category ? 'bg-red-700 hover:bg-red-800 border-none' : 'bg-white border-slate-200 text-slate-600'}`}
                 onClick={() => setActiveCategory(category)}
               >
-                {t(`menu.categories.${category.toLowerCase()}`)}
+                {t(`menu.categories.${category.toLowerCase()}`, { defaultValue: category })}
               </Button>
             ))}
           </div>
@@ -69,7 +74,7 @@ export const MenuGrid = () => {
                   <div className="relative h-64 overflow-hidden">
                     <img 
                       src={item.image} 
-                      alt={t(`menu.items.${item.id}.name`)}
+                      alt={t(`menu.items.${item.id}.name`, { defaultValue: item.name })}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute top-4 right-4 flex flex-col gap-2">
@@ -82,12 +87,12 @@ export const MenuGrid = () => {
                   </div>
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl font-bold text-slate-800">{t(`menu.items.${item.id}.name`)}</CardTitle>
+                      <CardTitle className="text-xl font-bold text-slate-800">{t(`menu.items.${item.id}.name`, { defaultValue: item.name })}</CardTitle>
                       <span className="text-lg font-extrabold text-red-700">${item.price.toFixed(2)}</span>
                     </div>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-slate-500 text-sm leading-relaxed">{t(`menu.items.${item.id}.description`)}</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">{t(`menu.items.${item.id}.description`, { defaultValue: item.description })}</p>
                   </CardContent>
                   <CardFooter className="pt-4 border-t border-slate-100">
                     <Button 

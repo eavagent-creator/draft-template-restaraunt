@@ -1,0 +1,837 @@
+[
+  {
+    "name": "SÁBANAS ",
+    "desc": "Grilled steak with shrimp in red hot sauce and cheese Bistec asado, camarones, quesillo en salsa roja picante",
+    "price": "21"
+  },
+  {
+    "name": "MOLE POBLANO",
+    "desc": "Chicken legs topped with mole sauce. Served with rice, beans and salad. Servido con arroz, frijoles y ensalada. ",
+    "price": "19"
+  },
+  {
+    "name": "BISTEC ENCEBOLLADO",
+    "desc": "Grilled Steak with onions. ",
+    "price": "16"
+  },
+  {
+    "name": "BISTEC RANCHERO",
+    "desc": "Steak sauteed with onions and peppers in red hot sauce",
+    "price": "16"
+  },
+  {
+    "name": "BISTEC EN SALSA DE CHIPOTLE",
+    "desc": "Steak in chipotle sauce",
+    "price": "17"
+  },
+  {
+    "name": "LENGUA EN SALSA",
+    "desc": "Beef Tongue sauteed in sauce (red or green). ",
+    "price": "18"
+  },
+  {
+    "name": "CHULETAS EN SALSA",
+    "desc": "Pork chops in sauce (red or green). ",
+    "price": "18"
+  },
+  {
+    "name": "CAMARONES EMPANIZADOS",
+    "desc": "Breaded shrimp",
+    "price": "19"
+  },
+  {
+    "name": "CAMARONES RANCHEROS",
+    "desc": "Shrimp sauteed with onions and peppers in red hot sauce",
+    "price": "19"
+  },
+  {
+    "name": "CAMARONES AL AJILLO",
+    "desc": "Shrimp sauteed in garlic butter",
+    "price": "19"
+  },
+  {
+    "name": "POLLO A LA MEXICANA",
+    "desc": "Grilled chicken sauteed with onions, jalapeno, tomatoes and red sauce. ",
+    "price": "16"
+  },
+  {
+    "name": "POLLO EN SALSA DE CHIPOTLE",
+    "desc": "Grilled chicken sauteed in chipotle sauce. ",
+    "price": "16"
+  },
+  {
+    "name": "ENCHILADAS ",
+    "desc": "In green and red sauce.  With your choice of meat: Chicken, Sreal or Prok, Beef tongue add $2.00",
+    "price": "16"
+  },
+  {
+    "name": "MOJARRA FRITA",
+    "desc": "Fried red porgy with rice, beans and salad.",
+    "price": "18"
+  },
+  {
+    "name": "FILETE DE PESCADO FRITO",
+    "desc": "Fried fish filet",
+    "price": "16"
+  },
+  {
+    "name": "ALAMBRES DE RES",
+    "desc": "Bistec asado con nopales, quesillo y cebollines. Grilled beef steak, with grilled cactus leaf, string cheese and Cambray onions.",
+    "price": "19"
+  },
+  {
+    "name": "ALAMBRES DE LENGUA",
+    "desc": "Con nopales, quesillo y cebollines. Beef tongue, with grilled cactus leaf, string cheese and Cambray onions.",
+    "price": "20"
+  },
+  {
+    "name": "ALAMBRES DE CAMARON",
+    "desc": "Con nopales, quesillo y cebollines. Grilled shrimp, with grilled cactus leaf, string cheese and Cambray onions.",
+    "price": "22"
+  },
+  {
+    "name": "ALAMBRES DE COSTILLA",
+    "desc": "Con nopales, quesillo y cebollines. Grilled ribs T-Bone Steak, with grilled cactus leaf, string cheese and Cambray onions.",
+    "price": "25"
+  },
+  {
+    "name": "BURRITO DINER",
+    "desc": "Add your meats.  Beef tongue $19.00 Shrimp $19.0",
+    "price": "16"
+  },
+  {
+    "name": "FLAUTA DINER",
+    "desc": "Add your meats.  Beef tongue $19.00 Shrimp $19.0",
+    "price": "16"
+  },
+  {
+    "name": "QUESADILLA DINER",
+    "desc": "Add your meats.  Beef tongue $19.00 Shrimp $19.0",
+    "price": "16"
+  },
+  {
+    "name": "CHIMICHANGA  DINER",
+    "desc": "Add your meats.  Beef tongue $19.00 Shrimp $19.00",
+    "price": "16"
+  },
+  {
+    "name": "TACOS  DINER",
+    "desc": "With chicken, Mexican sausage, braised pork meat, spicy pork meat, beef steak, salty beef or mix. Con pollo, chorizo, carnitas, carne enchilada, bistec, cecina o mixto.  Additional meats.  Beef tongue $19.00 Shrimp $19.00",
+    "price": "16"
+  },
+  {
+    "name": "NACHOS",
+    "desc": "Chips, refried beans, cheese, onion, tomato, cilantro, avocado and jalapenos. Choose your meat: Chicken, Mexican sausage, braised pork or spicy pork meat. Add $1 for Beef Steak or Salty Beef. Elija su carne: Pollo, chorizo, carnitas o carne enchilada. Agregue $1 por Bistec o Cecina. ",
+    "price": "15"
+  },
+  {
+    "name": "TOSTADAS (3)",
+    "desc": "Choose your meat: Chicken, Mexican sausage, braised pork or spicy pork meat. Add $1 for Beef Steak or Salty Beef. Elija su carne: Pollo, chorizo, carnitas o carne enchilada. Agregue $1 por Bistec o Cecina. ",
+    "price": "15"
+  },
+  {
+    "name": "HUARACHES",
+    "desc": "Choose your meat: Chicken, Mexican sausage, braised pork or spicy pork meat. Add $2 for Beef Steak or Salty Beef. Add $4 for Beef Tongue or shrimp. Add $9 for T-Bone Steak  Elija su carne: Pollo, chorizo, carnitas o carne enchilada. Agregue $1 por Bistec o Cecina. Agregue $4 por Lengua o Camarones. Agregue $9 por Costilla",
+    "price": "16"
+  },
+  {
+    "name": "QUESADILLAS",
+    "desc": "Choose your meat: Beef steak, salt beef or mix. Served with Salad. Add $3 for Beef Tongue or Shrimp and salad. Elija su carne: Bistec, cecina o mix de carnes. Servido con ensalada. Agregue $3 por Lengua o Camarone con Ensalada. ",
+    "price": "13"
+  },
+  {
+    "name": "POZOLE CON TOSTADAS",
+    "desc": "Corn soup with pork",
+    "price": "17"
+  },
+  {
+    "name": "PANCITA",
+    "desc": "Tripe soup",
+    "price": "17"
+  },
+  {
+    "name": "CHILAQUILES",
+    "desc": "Tortilla chips cooked with sauce. Choose your meat: Chicken, Mexican sausage or braised pork meat. Add $2 for Beef Tongue or Shrimp. Elija su carne: Pollo, chorizo o carnitas. Agregue $2 por Lengua o Camaron.",
+    "price": "16"
+  },
+  {
+    "name": "COCTEL DE CAMARONES",
+    "desc": "Shrimp Cocktail",
+    "price": "18"
+  },
+  {
+    "name": "SOPA DE MARISCOS",
+    "desc": "Mixed seafood",
+    "price": "19"
+  },
+  {
+    "name": "MARISCOS VERACRUZANOS",
+    "desc": "Seafood Veracruz style",
+    "price": "19"
+  },
+  {
+    "name": "MARISCOS EN CHIPOTLE",
+    "desc": "Seafood with chipotle sauce",
+    "price": "19"
+  },
+  {
+    "name": "GUACAMOLE",
+    "desc": "With chips add $2.00",
+    "price": "10"
+  },
+  {
+    "name": "ORDEN DE NOPALES",
+    "desc": "Order of grilled Cactus leaves",
+    "price": "9"
+  },
+  {
+    "name": "ORDEN DE CEBOLLINES",
+    "desc": "Order of grilled Scallions",
+    "price": "7"
+  },
+  {
+    "name": "ORDEN DE ARRROZ Y FRIJOLES",
+    "desc": "Order of rice and beans",
+    "price": "7"
+  },
+  {
+    "name": "Order of 3 Tacos",
+    "desc": "Choose your meat: Chicken, Mexican sausage, braised pork, or spicy pork meat. Elija su carne: Pollo, chorizo, carnitas o carne enchilada. ",
+    "price": "12"
+  },
+  {
+    "name": "Beef Tongue\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos de Lengua",
+    "price": "16"
+  },
+  {
+    "name": "Charcoal Grilled Pork\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos al Carbón de puerco",
+    "price": "13"
+  },
+  {
+    "name": "Arabe Tacos\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos Arabes",
+    "price": "14"
+  },
+  {
+    "name": " Tacos Mix\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos Mix",
+    "price": "12"
+  },
+  {
+    "name": "Beef SteakTacos\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos de Bistec",
+    "price": "12"
+  },
+  {
+    "name": "Salty Beef Tacos\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos de Cecina",
+    "price": "13"
+  },
+  {
+    "name": "Marinated Pork Tacos\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos al Pastor",
+    "price": "13"
+  },
+  {
+    "name": "Shrimp Tacos\\/Order of 3 Tacos",
+    "desc": "Orden de 3 Tacos de Camarón ",
+    "price": "16"
+  },
+  {
+    "name": "Bandeja de Nachos",
+    "desc": "Nachos Tray Regular Nachos $36/Large $70",
+    "price": "36"
+  },
+  {
+    "name": "Bandeja de Nachos \\/ Tongue",
+    "desc": "Tongue Beef Nachos Tray Regular Nachos $40/Large $80",
+    "price": "40"
+  },
+  {
+    "name": "Torta Cubana",
+    "desc": "Mexican Sandwich in a roll bread, Cuban Style",
+    "price": "12"
+  },
+  {
+    "name": "Torta de Lengua",
+    "desc": "Beef Tongue Mexican Sandwich in a roll bread",
+    "price": "12"
+  },
+  {
+    "name": "Torta de Cecina",
+    "desc": "Salty Beef Mexican Sandwich in a roll bread",
+    "price": "12"
+  },
+  {
+    "name": "Torta Mix",
+    "desc": "Mix Meat Mexican Sandwich in a roll bread",
+    "price": "12"
+  },
+  {
+    "name": "Torta Milanesa de Res",
+    "desc": "Breaded Beef Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta Milanesa de Pollo",
+    "desc": "Breaded Chicken Breast Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta de Carne Enchilada",
+    "desc": "Spicy Pork Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta de Pollo",
+    "desc": "Chicken Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta de Carnitas",
+    "desc": "Braised Pork Meat Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta de Chorizo",
+    "desc": "Mexican Sausage Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Torta de Jamón ",
+    "desc": "Ham Mexican Sandwich in a roll bread",
+    "price": "11"
+  },
+  {
+    "name": "Cuban Cemita",
+    "desc": "Poblano-Style Sandwich - Cuban",
+    "price": "13"
+  },
+  {
+    "name": "Cemita de Lengua",
+    "desc": "Beef Tongue Poblano-Style Sandwich",
+    "price": "13"
+  },
+  {
+    "name": "Cemita de Cecina",
+    "desc": "Salty Beef Poblano-Style Sandwich",
+    "price": "13"
+  },
+  {
+    "name": "Cemita Mix",
+    "desc": "Mix Meat Poblano-Style Sandwich",
+    "price": "13"
+  },
+  {
+    "name": "Cemita de Milanesa de Res",
+    "desc": "Breaded Beef Steak Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Cemita de Milanesa de Pollo",
+    "desc": "Breaded Chicken Breast Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Cemita de Carne Enchilada",
+    "desc": "Spicy Pork Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Cemita de Pollo",
+    "desc": "Chicken Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": " Cemita de Carnitas",
+    "desc": "Braised Pork Meat Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Cemita de Chorizo",
+    "desc": "Mexican Sausage Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Cemita de Jamón ",
+    "desc": "Ham Poblano-Style Sandwich",
+    "price": "12"
+  },
+  {
+    "name": "Burrito de Pollo",
+    "desc": "Chicken Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream.",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Carnitas",
+    "desc": "Pork Braised meat Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Chorizo",
+    "desc": "Mexican Sausage Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Carne Enchilada",
+    "desc": "Spicy Pork Meat Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Bistec",
+    "desc": "Beef Steak Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Cecina",
+    "desc": "Salty Beef Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito Mix",
+    "desc": "Mix Meats Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "13"
+  },
+  {
+    "name": "Burrito de Lengua",
+    "desc": "Tongue Beef Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "16"
+  },
+  {
+    "name": "Burrito de Camarón ",
+    "desc": "Shrimp Burrito. Flour tortilla stuffed with rice, beans, vegetables and sour cream",
+    "price": "16"
+  },
+  {
+    "name": "HAMBURGER",
+    "desc": "Hamburgesa sencilla. Served with lettuce, tomato and mayo",
+    "price": "7.50"
+  },
+  {
+    "name": "CHEESEBURGER",
+    "desc": "Served with lettuce, tomato, mayo and fries.",
+    "price": "8"
+  },
+  {
+    "name": "BACON CHEESEBURGER",
+    "desc": "Served with lettuce, tomato and mayo",
+    "price": "9"
+  },
+  {
+    "name": "GYRO SANDWICH",
+    "desc": "With lettuce, tomato, onions, peppers and cucumbers sauce on a pita bread",
+    "price": "10"
+  },
+  {
+    "name": "GYRO DINER",
+    "desc": "With french fries, lettuce, tomato, onions, peppers and cucumbers sauce on a pita bread",
+    "price": "13"
+  },
+  {
+    "name": "Steak and Cheese Grinder",
+    "desc": "Served with lettuce, tomato and mayonnaise",
+    "price": "11"
+  },
+  {
+    "name": "Turkey Grinder",
+    "desc": "Served with lettuce, tomato, cheese and mayonnaise",
+    "price": "11"
+  },
+  {
+    "name": "Chicken Cutlet Grinder",
+    "desc": "Served with lettuce, tomato and mayonnaise",
+    "price": "11"
+  },
+  {
+    "name": "Chicken Parmigiana Grinder",
+    "desc": "Served with sauce and cheese",
+    "price": "11"
+  },
+  {
+    "name": "Ham Grinder",
+    "desc": "Served with lettuce, tomato, cheese and mayonnaise",
+    "price": "11"
+  },
+  {
+    "name": "Ham and Cheese Sandwich Club",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Bacon Sandwich Club",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Turkey with Bacon Sandwich Club",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Chicken with Cheese Sandwich Club",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Hamburger with Bacon",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Cheeseburger with Bacon",
+    "desc": "Prepared with lettuce, tomato and mayo. Served with French Fries and Pickles. ",
+    "price": "14"
+  },
+  {
+    "name": "Mozzarella Pizza",
+    "desc": "Choose your size.",
+    "price": "10"
+  },
+  {
+    "name": "Bacon Pizza",
+    "desc": "Choose your size.",
+    "price": "13"
+  },
+  {
+    "name": "Pepperoni Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Sausage Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Ham Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Broccoli Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Mushroom Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Peppers Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Onions Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Fresh Garlic Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Pineapple Pizza",
+    "desc": "Choose your size.",
+    "price": "12"
+  },
+  {
+    "name": "Chicken Pizza",
+    "desc": "Choose your size.",
+    "price": "14"
+  },
+  {
+    "name": "Special Pizza - House Special",
+    "desc": "Mushrooms, bacon, pepperoni, sausage, peppers and onions. Choose your size.",
+    "price": "15"
+  },
+  {
+    "name": "Special Pizza - Vegetarian",
+    "desc": "Onions, peppers, broccoli, mushrooms, olives and eggplant. Choose your size.",
+    "price": "15"
+  },
+  {
+    "name": "Special Pizza - Pizza Mexicana",
+    "desc": "Spicy pork meat, onions, peppers, mushrooms and broccoli. Choose your size.",
+    "price": "18"
+  },
+  {
+    "name": "Special Pizza - Chicken & Broccoli",
+    "desc": " Choose your size.",
+    "price": "15"
+  },
+  {
+    "name": "Special Pizza - Hawaiian Pizza",
+    "desc": " Choose your size.",
+    "price": "14"
+  },
+  {
+    "name": "Special Pizza - Shrimp Pizza",
+    "desc": " Choose your size.",
+    "price": "17"
+  },
+  {
+    "name": "Cheese Calzone",
+    "desc": "Small  $11; Large $14.00",
+    "price": "11"
+  },
+  {
+    "name": "Sausage Calzone",
+    "desc": "Small $13 Large $15.00",
+    "price": "13"
+  },
+  {
+    "name": "Ham Calzone",
+    "desc": "Small $13 Large $15.00",
+    "price": "13"
+  },
+  {
+    "name": "Mushroom Calzone",
+    "desc": "Small $13 Large $15.00",
+    "price": "13"
+  },
+  {
+    "name": "Chicken Calzone",
+    "desc": "Small $14 Large $17.00",
+    "price": "14"
+  },
+  {
+    "name": "Special Mi Mexico Lindo Calzone",
+    "desc": "With meatballs, sausage, mushrooms, bacon, onions, pepperoni and peppers. Small $15 Large $18.00",
+    "price": "15"
+  },
+  {
+    "name": "Chicken Parmigiana",
+    "desc": "Served with bread and salad",
+    "price": "15"
+  },
+  {
+    "name": "Tossed Salad",
+    "desc": "Lettuce, tomato, onions and peppers. Asdd $1 for Avocado",
+    "price": "9"
+  },
+  {
+    "name": "Grilled Chicken Salad",
+    "desc": "Grilled chicen, lettuce, tomato, onions, peppers and olives. Asdd $1 for Avocado",
+    "price": "14"
+  },
+  {
+    "name": "Agua de Horchata",
+    "desc": "Rice water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Tamarindo",
+    "desc": "Tamarind water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Papaya",
+    "desc": "Papaya water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Melon",
+    "desc": "Cantaloupe water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Fresa",
+    "desc": "Strawberry water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Mamey",
+    "desc": "Mamey water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Agua de Guanabana",
+    "desc": "Soursop water. Small $4.00 Large $7.00",
+    "price": "4"
+  },
+  {
+    "name": "Coca Cola",
+    "desc": "12oz can",
+    "price": "2"
+  },
+  {
+    "name": "Batido de Fresa",
+    "desc": "Strawberry milkshake. Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Batido de Platano",
+    "desc": "Banana milkshake.  Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Batido de Papaya",
+    "desc": "Papaya milkshake.  Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Batido de Melon",
+    "desc": "Cantaloupe milkshake.  Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Batido de Mamey",
+    "desc": "Mamey milkshake.  Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Batido de Guanabana",
+    "desc": "Soursop milkshake.  Small $5.00 Large $8.00",
+    "price": "5"
+  },
+  {
+    "name": "Jarritos",
+    "desc": "Choose your flavor",
+    "price": "3"
+  },
+  {
+    "name": "2Lt Jarritos",
+    "desc": "Choose your flavor",
+    "price": "4"
+  },
+  {
+    "name": "Mexican Coca Cola",
+    "desc": "",
+    "price": "3"
+  },
+  {
+    "name": "Sidral Mundet",
+    "desc": "",
+    "price": "3"
+  },
+  {
+    "name": "Sangria Señorial",
+    "desc": "",
+    "price": "3"
+  },
+  {
+    "name": "Squirt",
+    "desc": "",
+    "price": "3"
+  },
+  {
+    "name": "Orange Fanta",
+    "desc": "",
+    "price": "3"
+  },
+  {
+    "name": "20 oz Sodas",
+    "desc": "Choose your flavor",
+    "price": "3"
+  },
+  {
+    "name": "2Lt Sodas",
+    "desc": "Choose your flavor",
+    "price": "5"
+  },
+  {
+    "name": "Boing Nectars",
+    "desc": "Choose your flavor",
+    "price": "3"
+  },
+  {
+    "name": "Agua Dasani",
+    "desc": "20oz",
+    "price": "3"
+  },
+  {
+    "name": "Minute Maid Orange Juice",
+    "desc": "12oz",
+    "price": "3"
+  },
+  {
+    "name": "Minute Maid Apple Juice",
+    "desc": "12oz",
+    "price": "3"
+  },
+  {
+    "name": "Gatorade",
+    "desc": "Choose your flavor",
+    "price": "3"
+  },
+  {
+    "name": "Red Bull",
+    "desc": "8.4oz",
+    "price": "4"
+  },
+  {
+    "name": "Monster Energy",
+    "desc": "16oz",
+    "price": "4"
+  },
+  {
+    "name": "Minute Maid Lemonade",
+    "desc": "20oz",
+    "price": "3"
+  },
+  {
+    "name": "BUFFALO WINGS ",
+    "desc": "8 Pcs. Add $5 for French Fries",
+    "price": "10"
+  },
+  {
+    "name": "FRIED CHICKEN WINGS ",
+    "desc": "8 Pcs. Add $5 for French Fries",
+    "price": "10"
+  },
+  {
+    "name": "FRIED MOZZARELLA STICKS ",
+    "desc": "8 Pcs. Add $5 for French Fries",
+    "price": "9"
+  },
+  {
+    "name": "GARLIC BREAD",
+    "desc": "Add $0.50 for Cheese",
+    "price": "3.50"
+  },
+  {
+    "name": "FRENCH FRIES",
+    "desc": "",
+    "price": "6"
+  },
+  {
+    "name": "ONION RINGS",
+    "desc": "",
+    "price": "6"
+  },
+  {
+    "name": "Flan ",
+    "desc": "Custard flan ",
+    "price": "5"
+  },
+  {
+    "name": "Gelatina",
+    "desc": "Mexican Jelly",
+    "price": "3.50"
+  },
+  {
+    "name": "Banana con Crema",
+    "desc": "Small $6.00 Large $10.00",
+    "price": "6"
+  },
+  {
+    "name": "Fresas con Crema",
+    "desc": "Small $8.00 Large $15.00",
+    "price": "8"
+  },
+  {
+    "name": "Cheesecake",
+    "desc": "",
+    "price": "5"
+  },
+  {
+    "name": "Pastel de Tres Leches",
+    "desc": "Three Milk Cake",
+    "price": "5"
+  }
+]

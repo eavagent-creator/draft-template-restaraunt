@@ -9,11 +9,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { businessConfig } from "../config/business";
-import { LayoutDashboard, Utensils, Settings, Package, Plus, Trash2, Edit2, CheckCircle2, Clock, MapPin, Phone, X, AlertTriangle, ChevronDown, CreditCard, Banknote } from "lucide-react";
+import { LayoutDashboard, Utensils, Settings, Package, Plus, Trash2, Edit2, CheckCircle2, Clock, MapPin, Phone, X, AlertTriangle, ChevronDown, CreditCard, Banknote, Search } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, Timestamp, deleteField } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, Timestamp, deleteField, addDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { handleFirestoreError, OperationType } from "@/lib/firestore-errors";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,9 +49,27 @@ interface Order {
   estimatedReadyAt?: { seconds: number; nanoseconds: number };
 }
 
+interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  isAvailable: boolean;
+  createdAt?: any;
+}
+
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderFilter, setOrderFilter] = useState<Order['status'] | 'all'>('pending');
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [isEditingItem, setIsEditingItem] = useState(false);
+  const [currentItem, setCurrentItem] = useState<Partial<MenuItem>>({});
+  const [isDeletingItem, setIsDeletingItem] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
@@ -57,8 +83,106 @@ export default function AdminDashboard() {
       handleFirestoreError(error, OperationType.GET, "orders");
     });
 
-    return () => unsubscribe();
+    const menuQ = query(collection(db, "menuItems"), orderBy("name", "asc"));
+    const menuUnsubscribe = onSnapshot(menuQ, (snapshot) => {
+      const menuData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as MenuItem[];
+      setMenuItems(menuData);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, "menuItems");
+    });
+
+    return () => {
+      unsubscribe();
+      menuUnsubscribe();
+    };
   }, []);
+
+  const migrateMenuToDB = async () => {
+    try {
+      const batch = writeBatch(db);
+      businessConfig.menu.forEach((item) => {
+        const docRef = doc(collection(db, "menuItems"), item.id);
+        batch.set(docRef, {
+          ...item,
+          createdAt: serverTimestamp()
+        });
+      });
+      await batch.commit();
+      toast.success("Menu migrated to database successfully");
+    } catch (error) {
+      toast.error("Failed to migrate menu");
+      handleFirestoreError(error, OperationType.WRITE, "menuItems");
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast.error("Image too large. Max 1MB.");
+      return;
+    }
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCurrentItem(prev => ({ ...prev, image: reader.result as string }));
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const saveMenuItem = async () => {
+    if (!currentItem.name || !currentItem.price || !currentItem.category || !currentItem.image) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    try {
+      if (currentItem.id) {
+        await updateDoc(doc(db, "menuItems", currentItem.id), {
+          ...currentItem,
+          updatedAt: serverTimestamp()
+        });
+        toast.success("Item updated");
+      } else {
+        await addDoc(collection(db, "menuItems"), {
+          ...currentItem,
+          createdAt: serverTimestamp(),
+          isAvailable: true
+        });
+        toast.success("Item added");
+      }
+      setIsEditingItem(false);
+      setCurrentItem({});
+    } catch (error) {
+      toast.error("Failed to save item");
+      handleFirestoreError(error, OperationType.WRITE, "menuItems");
+    }
+  };
+
+  const deleteMenuItem = async () => {
+    if (!itemToDelete) return;
+    try {
+      await deleteDoc(doc(db, "menuItems", itemToDelete));
+      toast.success("Item deleted");
+      setIsDeletingItem(false);
+      setItemToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete item");
+      handleFirestoreError(error, OperationType.DELETE, `menuItems/${itemToDelete}`);
+    }
+  };
+
+  const filteredMenuItems = menuItems.filter(item => 
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const updateOrderStatus = async (orderId: string, status: Order['status'], additionalData?: Partial<Order>) => {
     try {
@@ -152,37 +276,104 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="menu">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-slate-800">Menu Management</h3>
-              <Button className="bg-red-700 hover:bg-red-800 flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                Add Item
-              </Button>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <h3 className="text-xl font-bold text-slate-800">Menu Management</h3>
+                {menuItems.length === 0 && (
+                  <Button variant="outline" size="sm" onClick={migrateMenuToDB} className="text-xs">
+                    Import from Config
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="relative flex-grow md:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input 
+                    placeholder="Search dishes or categories..." 
+                    className="pl-9 h-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Button 
+                  className="bg-red-700 hover:bg-red-800 flex items-center gap-2 h-10 shrink-0"
+                  onClick={() => {
+                    setCurrentItem({ isAvailable: true });
+                    setIsEditingItem(true);
+                  }}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Item
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {businessConfig.menu.map((item) => (
-                <Card key={item.id} className="border-slate-200 shadow-sm overflow-hidden group">
-                  <div className="aspect-video relative overflow-hidden">
-                    <img src={item.image} alt={item.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute top-2 right-2 flex gap-2">
-                      <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full shadow-lg">
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button size="icon" variant="destructive" className="h-8 w-8 rounded-full shadow-lg">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+            
+            {menuItems.length === 0 ? (
+              <div className="text-center py-20 bg-white border border-slate-200 border-dashed rounded-2xl">
+                <Utensils className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-800">No menu items found</h3>
+                <p className="text-slate-500 mb-6">Start by adding your first menu item or imports from config.</p>
+                <Button onClick={migrateMenuToDB} variant="outline">Import Initial Menu</Button>
+              </div>
+            ) : filteredMenuItems.length === 0 ? (
+              <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl">
+                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-slate-800">No matching items</h3>
+                <p className="text-slate-500">Try adjusting your search term.</p>
+                <Button variant="ghost" onClick={() => setSearchTerm("")} className="mt-4">Clear search</Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredMenuItems.map((item) => (
+                  <Card key={item.id} className="border-slate-200 shadow-sm overflow-hidden group">
+                    <div className="aspect-video relative overflow-hidden bg-slate-100">
+                      <img src={item.image} alt={item.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute top-2 right-2 flex gap-2">
+                        <Button 
+                          size="icon" 
+                          variant="secondary" 
+                          className="h-8 w-8 rounded-full shadow-lg"
+                          onClick={() => {
+                            setCurrentItem(item);
+                            setIsEditingItem(true);
+                          }}
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="destructive" 
+                          className="h-8 w-8 rounded-full shadow-lg"
+                          onClick={() => {
+                            setItemToDelete(item.id);
+                            setIsDeletingItem(true);
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      {!item.isAvailable && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <Badge variant="destructive" className="uppercase font-bold tracking-wider px-3 py-1">Unavailable</Badge>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <CardHeader className="p-4">
-                    <div className="flex justify-between items-start gap-2">
-                      <CardTitle className="text-lg">{item.name}</CardTitle>
-                      <span className="font-bold text-red-700">${item.price}</span>
-                    </div>
-                    <CardDescription className="line-clamp-2 mt-1">{item.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
+                    <CardHeader className="p-4">
+                      <div className="flex justify-between items-start gap-2">
+                        <CardTitle className="text-lg">{item.name}</CardTitle>
+                        <span className="font-bold text-red-700">${item.price.toFixed(2)}</span>
+                      </div>
+                      <CardDescription className="line-clamp-2 mt-1">{item.description}</CardDescription>
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-500">
+                          {item.category}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="orders">
@@ -421,6 +612,127 @@ export default function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Add/Edit Item Dialog */}
+      <Dialog open={isEditingItem} onOpenChange={setIsEditingItem}>
+        <DialogContent className="sm:max-w-[525px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{currentItem.id ? 'Edit Menu Item' : 'Add New Menu Item'}</DialogTitle>
+            <DialogDescription>
+              Fill in the details for the menu item. For images, you can upload a file (max 1MB).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Item Name</Label>
+              <Input 
+                id="name" 
+                value={currentItem.name || ''} 
+                onChange={(e) => setCurrentItem(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Targeting Name..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="price">Price ($)</Label>
+                <Input 
+                  id="price" 
+                  type="number"
+                  value={currentItem.price || ''} 
+                  onChange={(e) => setCurrentItem(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="category">Category</Label>
+                <Input 
+                  id="category" 
+                  value={currentItem.category || ''} 
+                  onChange={(e) => setCurrentItem(prev => ({ ...prev, category: e.target.value }))}
+                  placeholder="e.g. Entrees, Sides"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea 
+                id="description" 
+                value={currentItem.description || ''} 
+                onChange={(e) => setCurrentItem(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Tell customers about this dish..."
+                rows={3}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="image">Photo</Label>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-lg border bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                  {currentItem.image ? (
+                    <img src={currentItem.image} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Utensils className="w-8 h-8 text-slate-300" />
+                  )}
+                </div>
+                <div className="flex-grow space-y-2">
+                  <Input 
+                    id="image-upload" 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="cursor-pointer"
+                  />
+                  <p className="text-[10px] text-slate-500">Max size 1MB. Larger images may fail to save.</p>
+                </div>
+              </div>
+              <div className="mt-2">
+                <Label htmlFor="image-url" className="text-xs">Or use Image URL</Label>
+                <Input 
+                  id="image-url" 
+                  value={currentItem.image || ''} 
+                  onChange={(e) => setCurrentItem(prev => ({ ...prev, image: e.target.value }))}
+                  placeholder="https://..."
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                id="isAvailable" 
+                checked={currentItem.isAvailable !== false}
+                onChange={(e) => setCurrentItem(prev => ({ ...prev, isAvailable: e.target.checked }))}
+                className="w-4 h-4 text-red-600 focus:ring-red-500 border-slate-300 rounded"
+              />
+              <Label htmlFor="isAvailable" className="font-medium">Item is available for ordering</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditingItem(false)}>Cancel</Button>
+            <Button onClick={saveMenuItem} className="bg-red-700 hover:bg-red-800" disabled={uploading}>
+              {uploading ? 'Processing...' : 'Save Item'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeletingItem} onOpenChange={setIsDeletingItem}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="w-5 h-5" />
+              Confirm Deletion
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this menu item? This action cannot be undone and it will be removed from the public menu immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsDeletingItem(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={deleteMenuItem}>Yes, Delete Item</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
