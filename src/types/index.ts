@@ -5,6 +5,7 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
+  subcategory?: string;
   image?: string;
   tags?: string[];
   isAvailable: boolean;

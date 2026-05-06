@@ -23,6 +23,8 @@ export const MenuGrid = () => {
   }, [categories, activeCategory]);
 
   const filteredMenu = menuItems.filter(item => item.category === activeCategory && item.isAvailable !== false);
+  const subcategories = Array.from(new Set(filteredMenu.map(item => item.subcategory).filter(Boolean)))
+    .sort() as string[];
 
   const handleAddToCart = (item: any) => {
     const translatedItem = {
@@ -58,56 +60,86 @@ export const MenuGrid = () => {
 
         <motion.div 
           layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="space-y-12"
         >
-          <AnimatePresence mode='popLayout'>
-            {filteredMenu.map(item => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl group h-full flex flex-col">
-                  <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={item.image} 
-                      alt={t(`menu.items.${item.id}.name`, { defaultValue: item.name })}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute top-4 right-4 flex flex-col gap-2">
-                       {item.tags?.map(tag => (
-                         <Badge key={tag} variant="secondary" className="bg-red-700 text-white border-none text-[10px] uppercase font-bold py-1 px-3 rounded-md">
-                           {tag}
-                         </Badge>
-                       ))}
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-12"
+            >
+              {/* Items without subcategories */}
+              {filteredMenu.filter(item => !item.subcategory).length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredMenu.filter(item => !item.subcategory).map(item => (
+                    <div key={item.id}>
+                      <MenuItemCard item={item} handleAddToCart={handleAddToCart} t={t} />
                     </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Grouped by subcategories */}
+              {subcategories.map((subcat) => (
+                <div key={subcat} className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-xl font-bold text-slate-700 uppercase tracking-wide">
+                      {subcat}
+                    </h3>
+                    <div className="h-px bg-slate-200 flex-grow" />
                   </div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl font-bold text-slate-800">{t(`menu.items.${item.id}.name`, { defaultValue: item.name })}</CardTitle>
-                      <span className="text-lg font-extrabold text-red-700">${item.price.toFixed(2)}</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-slate-500 text-sm leading-relaxed">{t(`menu.items.${item.id}.description`, { defaultValue: item.description })}</p>
-                  </CardContent>
-                  <CardFooter className="pt-4 border-t border-slate-100">
-                    <Button 
-                      className="w-full bg-white border-2 border-slate-100 font-bold text-slate-800 hover:bg-slate-50 rounded-xl transition-colors h-11"
-                      onClick={() => handleAddToCart(item)}
-                    >
-                      <Plus className="w-4 h-4 mr-2" /> {t('menu.addToCart')}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredMenu.filter(item => item.subcategory === subcat).map(item => (
+                      <div key={item.id}>
+                        <MenuItemCard item={item} handleAddToCart={handleAddToCart} t={t} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           </AnimatePresence>
         </motion.div>
       </div>
     </section>
   );
 };
+
+const MenuItemCard = ({ item, handleAddToCart, t }: any) => (
+  <Card className="overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl group h-full flex flex-col">
+    <div className="relative h-64 overflow-hidden">
+      <img 
+        src={item.image} 
+        alt={t(`menu.items.${item.id}.name`, { defaultValue: item.name })}
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute top-4 right-4 flex flex-col gap-2">
+         {item.tags?.map((tag: string) => (
+           <Badge key={tag} variant="secondary" className="bg-red-700 text-white border-none text-[10px] uppercase font-bold py-1 px-3 rounded-md">
+             {tag}
+           </Badge>
+         ))}
+      </div>
+    </div>
+    <CardHeader className="pb-2">
+      <div className="flex justify-between items-start">
+        <CardTitle className="text-xl font-bold text-slate-800">{t(`menu.items.${item.id}.name`, { defaultValue: item.name })}</CardTitle>
+        <span className="text-lg font-extrabold text-red-700">${item.price.toFixed(2)}</span>
+      </div>
+    </CardHeader>
+    <CardContent className="flex-grow">
+      <p className="text-slate-500 text-sm leading-relaxed">{t(`menu.items.${item.id}.description`, { defaultValue: item.description })}</p>
+    </CardContent>
+    <CardFooter className="pt-4 border-t border-slate-100">
+      <Button 
+        className="w-full bg-white border-2 border-slate-100 font-bold text-slate-800 hover:bg-slate-50 rounded-xl transition-colors h-11"
+        onClick={() => handleAddToCart(item)}
+      >
+        <Plus className="w-4 h-4 mr-2" /> {t('menu.addToCart')}
+      </Button>
+    </CardFooter>
+  </Card>
+);

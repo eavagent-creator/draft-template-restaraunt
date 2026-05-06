@@ -17,7 +17,7 @@ export const Hero = () => {
         <div 
           className="absolute inset-0 blur-3xl opacity-50 scale-110"
           style={{
-            backgroundImage: `url('/storefront.jpg')`,
+            backgroundImage: `url('/storefront-new.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -26,7 +26,7 @@ export const Hero = () => {
         <div 
           className="absolute inset-0 opacity-80"
           style={{
-            backgroundImage: `url('/storefront.jpg')`,
+            backgroundImage: `url('/storefront-new.jpg')`,
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',

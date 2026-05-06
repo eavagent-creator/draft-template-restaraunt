@@ -15,6 +15,13 @@ import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, Timestamp, deleteField, addDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { handleFirestoreError, OperationType } from "@/lib/firestore-errors";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -55,6 +62,7 @@ interface MenuItem {
   description: string;
   price: number;
   category: string;
+  subcategory?: string;
   image: string;
   isAvailable: boolean;
   createdAt?: any;
@@ -70,6 +78,23 @@ export default function AdminDashboard() {
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+  const [isAddingNewSubcategory, setIsAddingNewSubcategory] = useState(false);
+  const [activeMenuCategory, setActiveMenuCategory] = useState<string | null>(null);
+
+  const existingCategories = Array.from(new Set(menuItems.map(item => item.category)))
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (a === "Beverages") return 1;
+      if (b === "Beverages") return -1;
+      return a.localeCompare(b);
+    });
+
+  useEffect(() => {
+    if (existingCategories.length > 0 && !activeMenuCategory) {
+      setActiveMenuCategory(existingCategories[0]);
+    }
+  }, [existingCategories, activeMenuCategory]);
 
   useEffect(() => {
     const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
@@ -103,15 +128,87 @@ export default function AdminDashboard() {
   const migrateMenuToDB = async () => {
     try {
       const batch = writeBatch(db);
+      
+      // 1. First import standard menu items from config (excluding placeholders or miscategorized drinks)
       businessConfig.menu.forEach((item) => {
-        const docRef = doc(collection(db, "menuItems"), item.id);
+        // Skip items that are actually beverages (they will be handled in the next step with better data)
+        const isBeverage = item.category === "Beverages" || 
+                         item.category === "Platillos Tipicos" && (
+                           item.name.toLowerCase().includes("agua") || 
+                           item.name.toLowerCase().includes("batido") ||
+                           item.name.toLowerCase().includes("coca") ||
+                           item.name.toLowerCase().includes("jarritos") ||
+                           item.name.toLowerCase().includes("soda") ||
+                           item.name.toLowerCase().includes("juice")
+                         );
+        
+        if (!isBeverage) {
+          const docRef = doc(collection(db, "menuItems"), item.id);
+
+          batch.set(docRef, {
+            ...item,
+            createdAt: serverTimestamp()
+          });
+        }
+      });
+
+      // 2. Import comprehensive Beverage Items with correct categories and subcategories
+      const beverageItems = [
+        // Aguas Frescas ($4.00)
+        { name: "Agua de Horchata", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh rice water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Tamarindo", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh tamarind water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Papaya", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh papaya water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Melon", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh cantaloupe water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1623851505315-779836371752?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Fresa", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh strawberry water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1563223552-30d01fda3ead?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Mamey", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh mamey water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1628113310821-9445727fbf2c?auto=format&fit=crop&q=80&w=800" },
+        { name: "Agua de Guanabana", price: 4.0, category: "Beverages", subcategory: "Aguas Frescas", description: "Fresh soursop water (Small). Large available for $7.00.", image: "https://images.unsplash.com/photo-1623065640702-4853fd88b8fa?auto=format&fit=crop&q=80&w=800" },
+        
+        // Mexican Sodas ($3.00 - $4.00)
+        { name: "Jarritos", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Glass bottle selection. Choose your flavor.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "2Lt Jarritos", price: 4.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Large sharing size. Choose your flavor.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "Mexican Coca Cola", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Glass bottle, real cane sugar.", image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?auto=format&fit=crop&q=80&w=800" },
+        { name: "Sidral Mundet", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Mexican apple soda.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "Sangria Señorial", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Sparkling non-alcoholic sangria.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "Squirt", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Grapefruit soda.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "Orange Fanta", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Orange glass bottle.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "Boing Nectars", price: 3.0, category: "Beverages", subcategory: "Mexican Sodas", description: "Mango or Guava nectar.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+
+        // Batidos ($5.00)
+        { name: "Batido de Fresa", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Strawberry milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1543648964-18ab1e43fe2b?auto=format&fit=crop&q=80&w=800" },
+        { name: "Batido de Platano", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Banana milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1550586678-f71ee73c3584?auto=format&fit=crop&q=80&w=800" },
+        { name: "Batido de Papaya", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Papaya milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1550586678-f71ee73c3584?auto=format&fit=crop&q=80&w=800" },
+        { name: "Batido de Melon", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Cantaloupe milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1550586678-f71ee73c3584?auto=format&fit=crop&q=80&w=800" },
+        { name: "Batido de Mamey", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Mamey milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1550586678-f71ee73c3584?auto=format&fit=crop&q=80&w=800" },
+        { name: "Batido de Guanabana", price: 5.0, category: "Beverages", subcategory: "Batidos/Milkshakes", description: "Soursop milkshake (Small). Large available for $8.00.", image: "https://images.unsplash.com/photo-1550586678-f71ee73c3584?auto=format&fit=crop&q=80&w=800" },
+        
+        // Sodas ($2.00 - $5.00)
+        { name: "Coca Cola (12oz)", price: 2.0, category: "Beverages", subcategory: "Sodas", description: "12oz can.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "20 Oz Sodas", price: 3.0, category: "Beverages", subcategory: "Sodas", description: "Various flavors. Choose your favorite.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        { name: "2Lt Sodas", price: 5.0, category: "Beverages", subcategory: "Sodas", description: "Large sharing size. Various flavors.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=800" },
+        
+        // Water, Juice & Energy ($3.00 - $4.00)
+        { name: "Agua Dasani", price: 3.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "20oz bottle water.", image: "https://images.unsplash.com/photo-1560023907-5f339617ea30?auto=format&fit=crop&q=80&w=800" },
+        { name: "Minute Maid Orange Juice", price: 3.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "12oz orange juice.", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=800" },
+        { name: "Minute Maid Apple Juice", price: 3.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "12oz apple juice.", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=800" },
+        { name: "Minute Maid Lemonade", price: 3.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "20oz refreshing lemonade.", image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=800" },
+        { name: "Gatorade", price: 3.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "Choose your flavor.", image: "https://images.unsplash.com/photo-1579208575657-c595a05383b7?auto=format&fit=crop&q=80&w=800" },
+        { name: "Red Bull", price: 4.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "8.4oz energy drink.", image: "https://images.unsplash.com/photo-1527960669566-f882ba85a4c6?auto=format&fit=crop&q=80&w=800" },
+        { name: "Monster Energy", price: 4.0, category: "Beverages", subcategory: "Water, Juices & Energy", description: "16oz energy drink.", image: "https://images.unsplash.com/photo-1527960669566-f882ba85a4c6?auto=format&fit=crop&q=80&w=800" },
+      ];
+
+      beverageItems.forEach((item) => {
+        const id = item.name.toLowerCase().replace(/ /g, '-');
+        const docRef = doc(collection(db, "menuItems"), id);
+
         batch.set(docRef, {
           ...item,
+          isAvailable: true,
           createdAt: serverTimestamp()
         });
       });
+
       await batch.commit();
-      toast.success("Menu migrated to database successfully");
+      toast.success("Menu migrated with beverages successfully");
     } catch (error) {
       toast.error("Failed to migrate menu");
       handleFirestoreError(error, OperationType.WRITE, "menuItems");
@@ -158,6 +255,8 @@ export default function AdminDashboard() {
         toast.success("Item added");
       }
       setIsEditingItem(false);
+      setIsAddingNewCategory(false);
+      setIsAddingNewSubcategory(false);
       setCurrentItem({});
     } catch (error) {
       toast.error("Failed to save item");
@@ -178,11 +277,71 @@ export default function AdminDashboard() {
     }
   };
 
-  const filteredMenuItems = menuItems.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const convertImagesToLocalPaths = async () => {
+    try {
+      const getSmartImagePath = (name: string) => {
+        const filename = name.toLowerCase()
+          .replace(/[^a-z0-9]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '');
+        return `/menu-images/${filename}.jpg`;
+      };
+
+      const batch = writeBatch(db);
+      let count = 0;
+
+      for (const item of menuItems) {
+        if (item.image && item.image.startsWith('http')) {
+          const docRef = doc(db, "menuItems", item.id);
+          const localPath = getSmartImagePath(item.name);
+          batch.update(docRef, { image: localPath });
+          count++;
+        }
+      }
+
+      if (count > 0) {
+        await batch.commit();
+        toast.success(`Successfully converted ${count} image URLs to local paths!`);
+      } else {
+        toast.info("All images are already using local paths.");
+      }
+    } catch (error) {
+      console.error("Error converting images:", error);
+      toast.error("Failed to convert image paths");
+    }
+  };
+
+  const exportMenuBackup = () => {
+    try {
+      const dataStr = JSON.stringify(menuItems, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `menu_backup_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Menu backup downloaded successfully!");
+    } catch (error) {
+      toast.error("Failed to export backup");
+    }
+  };
+
+  const filteredMenuItems = menuItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = searchTerm ? true : item.category === activeMenuCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const activeSubcategories = Array.from(new Set(
+    filteredMenuItems.map(item => item.subcategory).filter(Boolean)
+  )) as string[];
 
   const updateOrderStatus = async (orderId: string, status: Order['status'], additionalData?: Partial<Order>) => {
     try {
@@ -276,104 +435,126 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="menu">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                <h3 className="text-xl font-bold text-slate-800">Menu Management</h3>
-                {menuItems.length === 0 && (
-                  <Button variant="outline" size="sm" onClick={migrateMenuToDB} className="text-xs">
-                    Import from Config
-                  </Button>
-                )}
-              </div>
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                <div className="relative flex-grow md:w-64">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input 
-                    placeholder="Search dishes or categories..." 
-                    className="pl-9 h-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-xl font-bold text-slate-800">Menu Management</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" onClick={exportMenuBackup} className="text-xs">
+                      Export Backup
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={convertImagesToLocalPaths} className="text-xs">
+                      Convert URLs to Local
+                    </Button>
+                  </div>
                 </div>
-                <Button 
-                  className="bg-red-700 hover:bg-red-800 flex items-center gap-2 h-10 shrink-0"
-                  onClick={() => {
-                    setCurrentItem({ isAvailable: true });
-                    setIsEditingItem(true);
-                  }}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Item
-                </Button>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <div className="relative flex-grow md:w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input 
+                      placeholder="Search across menu..." 
+                      className="pl-9 h-10"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    className="bg-red-700 hover:bg-red-800 flex items-center gap-2 h-10 shrink-0"
+                    onClick={() => {
+                      setCurrentItem({ isAvailable: true, category: activeMenuCategory || "" });
+                      setIsEditingItem(true);
+                      setIsAddingNewCategory(false);
+                      setIsAddingNewSubcategory(false);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Item
+                  </Button>
+                </div>
               </div>
-            </div>
-            
-            {menuItems.length === 0 ? (
-              <div className="text-center py-20 bg-white border border-slate-200 border-dashed rounded-2xl">
-                <Utensils className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-800">No menu items found</h3>
-                <p className="text-slate-500 mb-6">Start by adding your first menu item or imports from config.</p>
-                <Button onClick={migrateMenuToDB} variant="outline">Import Initial Menu</Button>
-              </div>
-            ) : filteredMenuItems.length === 0 ? (
-              <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl">
-                <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-800">No matching items</h3>
-                <p className="text-slate-500">Try adjusting your search term.</p>
-                <Button variant="ghost" onClick={() => setSearchTerm("")} className="mt-4">Clear search</Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredMenuItems.map((item) => (
-                  <Card key={item.id} className="border-slate-200 shadow-sm overflow-hidden group">
-                    <div className="aspect-video relative overflow-hidden bg-slate-100">
-                      <img src={item.image} alt={item.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
-                      <div className="absolute top-2 right-2 flex gap-2">
-                        <Button 
-                          size="icon" 
-                          variant="secondary" 
-                          className="h-8 w-8 rounded-full shadow-lg"
-                          onClick={() => {
-                            setCurrentItem(item);
-                            setIsEditingItem(true);
+
+              {/* Category selector for Admin */}
+              {!searchTerm && existingCategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 pb-2 border-b border-slate-100">
+                  {existingCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveMenuCategory(cat)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                        activeMenuCategory === cat
+                        ? "bg-slate-900 text-white shadow-md"
+                        : "bg-white text-slate-500 hover:bg-slate-50 border border-slate-200"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {menuItems.length === 0 ? (
+                <div className="text-center py-20 bg-white border border-slate-200 border-dashed rounded-2xl">
+                  <Utensils className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-slate-800">No menu items found</h3>
+                  <p className="text-slate-500 mb-6">Start by adding your first menu item.</p>
+                </div>
+              ) : filteredMenuItems.length === 0 ? (
+                <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl">
+                  <Search className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-slate-800">No matching items</h3>
+                  <p className="text-slate-500">Try adjusting your search or switching categories.</p>
+                  <Button variant="ghost" onClick={() => { setSearchTerm(""); setActiveMenuCategory(existingCategories[0]); }} className="mt-4">Show All Menu</Button>
+                </div>
+              ) : (
+                <div className="space-y-12">
+                  {/* Items without subcategories */}
+                  {filteredMenuItems.filter(item => !item.subcategory).length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredMenuItems.filter(item => !item.subcategory).map((item) => (
+                        <MenuItemAdminCard 
+                          key={item.id} 
+                          item={item} 
+                          onEdit={(item) => { 
+                            setCurrentItem(item); 
+                            setIsEditingItem(true); 
+                            setIsAddingNewCategory(false);
+                            setIsAddingNewSubcategory(false);
                           }}
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button 
-                          size="icon" 
-                          variant="destructive" 
-                          className="h-8 w-8 rounded-full shadow-lg"
-                          onClick={() => {
-                            setItemToDelete(item.id);
-                            setIsDeletingItem(true);
-                          }}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                      {!item.isAvailable && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <Badge variant="destructive" className="uppercase font-bold tracking-wider px-3 py-1">Unavailable</Badge>
-                        </div>
-                      )}
+                          onDelete={(id) => { setItemToDelete(id); setIsDeletingItem(true); }}
+                        />
+                      ))}
                     </div>
-                    <CardHeader className="p-4">
-                      <div className="flex justify-between items-start gap-2">
-                        <CardTitle className="text-lg">{item.name}</CardTitle>
-                        <span className="font-bold text-red-700">${item.price.toFixed(2)}</span>
+                  )}
+
+                  {/* Grouped by subcategories */}
+                  {activeSubcategories.map((subcat) => (
+                    <div key={subcat} className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md">
+                          {subcat}
+                        </h4>
+                        <div className="h-px bg-slate-100 flex-grow" />
                       </div>
-                      <CardDescription className="line-clamp-2 mt-1">{item.description}</CardDescription>
-                      <div className="mt-2">
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-500">
-                          {item.category}
-                        </Badge>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredMenuItems.filter(item => item.subcategory === subcat).map((item) => (
+                          <MenuItemAdminCard 
+                            key={item.id} 
+                            item={item} 
+                            onEdit={(item) => { 
+                              setCurrentItem(item); 
+                              setIsEditingItem(true); 
+                              setIsAddingNewCategory(false);
+                              setIsAddingNewSubcategory(false);
+                            }}
+                            onDelete={(id) => { setItemToDelete(id); setIsDeletingItem(true); }}
+                          />
+                        ))}
                       </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="orders">
@@ -645,12 +826,110 @@ export default function AdminDashboard() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="category">Category</Label>
-                <Input 
-                  id="category" 
-                  value={currentItem.category || ''} 
-                  onChange={(e) => setCurrentItem(prev => ({ ...prev, category: e.target.value }))}
-                  placeholder="e.g. Entrees, Sides"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {!isAddingNewCategory ? (
+                    <Select 
+                      value={currentItem.category || ""} 
+                      onValueChange={(value) => {
+                        if (value === "new") {
+                          setIsAddingNewCategory(true);
+                          setCurrentItem(prev => ({ ...prev, category: "" }));
+                        } else {
+                          setCurrentItem(prev => ({ ...prev, category: value }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {existingCategories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                        <SelectItem value="new" className="text-red-600 font-medium">
+                          + New Category
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input 
+                        id="category" 
+                        value={currentItem.category || ''} 
+                        onChange={(e) => setCurrentItem(prev => ({ ...prev, category: e.target.value }))}
+                        placeholder="New category name"
+                        autoFocus
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          setIsAddingNewCategory(false);
+                          if (existingCategories.length > 0) {
+                            setCurrentItem(prev => ({ ...prev, category: existingCategories[0] }));
+                          }
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+
+                  {!isAddingNewSubcategory ? (
+                    <Select 
+                      value={currentItem.subcategory || ""} 
+                      onValueChange={(value) => {
+                        if (value === "new") {
+                          setIsAddingNewSubcategory(true);
+                          setCurrentItem(prev => ({ ...prev, subcategory: "" }));
+                        } else if (value === "none") {
+                          setCurrentItem(prev => ({ ...prev, subcategory: "" }));
+                        } else {
+                          setCurrentItem(prev => ({ ...prev, subcategory: value }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger id="subcategory">
+                        <SelectValue placeholder="Subcategory (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none" className="text-slate-400">None</SelectItem>
+                        {Array.from(new Set(
+                          menuItems
+                            .filter(item => item.category === currentItem.category)
+                            .map(item => item.subcategory)
+                            .filter(Boolean)
+                        ))
+                        .sort()
+                        .map((sub) => (
+                          <SelectItem key={sub} value={sub as string}>{sub as string}</SelectItem>
+                        ))}
+                        <SelectItem value="new" className="text-red-600 font-medium">
+                          + New Subcategory
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input 
+                        id="subcategory" 
+                        value={currentItem.subcategory || ''} 
+                        onChange={(e) => setCurrentItem(prev => ({ ...prev, subcategory: e.target.value }))}
+                        placeholder="New subcategory name"
+                        autoFocus
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          setIsAddingNewSubcategory(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="grid gap-2">
@@ -707,7 +986,10 @@ export default function AdminDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditingItem(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => {
+              setIsEditingItem(false);
+              setIsAddingNewCategory(false);
+            }}>Cancel</Button>
             <Button onClick={saveMenuItem} className="bg-red-700 hover:bg-red-800" disabled={uploading}>
               {uploading ? 'Processing...' : 'Save Item'}
             </Button>
@@ -734,5 +1016,63 @@ export default function AdminDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function MenuItemAdminCard({ 
+  item, 
+  onEdit, 
+  onDelete 
+}: { 
+  item: MenuItem; 
+  onEdit: (item: MenuItem) => void; 
+  onDelete: (id: string) => void; 
+}) {
+  return (
+    <Card className="border-slate-200 shadow-sm overflow-hidden group h-full flex flex-col">
+      <div className="aspect-video relative overflow-hidden bg-slate-100">
+        <img src={item.image} alt={item.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+        <div className="absolute top-2 right-2 flex gap-2">
+          <Button 
+            size="icon" 
+            variant="secondary" 
+            className="h-8 w-8 rounded-full shadow-lg"
+            onClick={() => onEdit(item)}
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+          </Button>
+          <Button 
+            size="icon" 
+            variant="destructive" 
+            className="h-8 w-8 rounded-full shadow-lg"
+            onClick={() => onDelete(item.id)}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+        {!item.isAvailable && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <Badge variant="destructive" className="uppercase font-bold tracking-wider px-3 py-1">Unavailable</Badge>
+          </div>
+        )}
+      </div>
+      <CardHeader className="p-4 flex-grow">
+        <div className="flex justify-between items-start gap-2">
+          <CardTitle className="text-lg">{item.name}</CardTitle>
+          <span className="font-bold text-red-700">${item.price.toFixed(2)}</span>
+        </div>
+        <CardDescription className="line-clamp-2 mt-1">{item.description}</CardDescription>
+        <div className="mt-2 flex flex-wrap gap-1">
+          <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-500">
+            {item.category}
+          </Badge>
+          {item.subcategory && (
+            <Badge variant="secondary" className="text-[10px] uppercase font-bold bg-slate-100 text-slate-600">
+              {item.subcategory}
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+    </Card>
   );
 }

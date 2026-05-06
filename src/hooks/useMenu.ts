@@ -10,6 +10,7 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
+  subcategory?: string;
   image: string;
   isAvailable: boolean;
   tags?: string[];
@@ -42,7 +43,12 @@ export const useMenu = () => {
     return () => unsubscribe();
   }, []);
 
-  const categories = Array.from(new Set(menuItems.map(item => item.category)));
+  const categories = Array.from(new Set(menuItems.map(item => item.category)))
+    .sort((a, b) => {
+      if (a === "Beverages") return 1;
+      if (b === "Beverages") return -1;
+      return a.localeCompare(b);
+    });
 
   return { menuItems, categories, loading };
 };

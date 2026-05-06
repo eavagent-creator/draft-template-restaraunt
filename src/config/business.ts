@@ -1150,8 +1150,9 @@ export const businessConfig: BusinessConfig = {
  name: "Agua De Horchata",
  description: "Rice water. Small $4.00 Large $7.00",
  price: 4,
- category: "Platillos Tipicos",
- image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80",
+ category: "Beverages",
+ subcategory: "Aguas Frescas",
+ image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=400&q=80",
  isAvailable: true
  },
  {
